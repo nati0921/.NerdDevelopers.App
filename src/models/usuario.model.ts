@@ -14,19 +14,14 @@ export class Usuario extends Entity {
     type: 'string',
     required: true,
   })
-  nombre: string;
+  nombres: string;
 
   @property({
     type: 'string',
     required: true,
   })
-  apellido: string;
+  apellidos: string;
 
-  @property({
-    type: 'string',
-    required: true,
-  })
-  usuario: string;
 
   @property({
     type: 'string',
