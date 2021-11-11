@@ -33,6 +33,10 @@ export class Carrito extends Entity {
   })
   total: number;
 
+  @property({
+    type: 'string',
+  })
+  productoId?: string;
 
   constructor(data?: Partial<Carrito>) {
     super(data);
