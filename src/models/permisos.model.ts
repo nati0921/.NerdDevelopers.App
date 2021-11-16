@@ -27,7 +27,6 @@ export class Permisos extends Entity {
   })
   rolesId: string;
 
-
   constructor(data?: Partial<Permisos>) {
     super(data);
   }
