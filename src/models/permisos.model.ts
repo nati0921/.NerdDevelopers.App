@@ -23,7 +23,7 @@ export class Permisos extends Entity {
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
   })
   rolesId: string;
 
