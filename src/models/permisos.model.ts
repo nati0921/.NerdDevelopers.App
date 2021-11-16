@@ -21,6 +21,12 @@ export class Permisos extends Entity {
   })
   descripcion: string;
 
+  @property({
+    type: 'string',
+    required: true,
+  })
+  rolesId: string;
+
 
   constructor(data?: Partial<Permisos>) {
     super(data);
