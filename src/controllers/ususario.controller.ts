@@ -1,29 +1,28 @@
+import {service} from '@loopback/core';
 import {
   Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
+  del, get,
+  getModelSchemaRef, param, patch, post, put, requestBody,
+  response
 } from '@loopback/rest';
 import {Usuario} from '../models';
 import {UsuarioRepository} from '../repositories';
-
+import {AutenticacionService} from '../services'; //Se requiere importar
+const fetch = require("node-fetch");
+//Inicializar un objeto para poder llamar un método
 export class UsusarioController {
   constructor(
     @repository(UsuarioRepository)
     public usuarioRepository : UsuarioRepository,
+    @service(AutenticacionService)
+    public servicioAutenticacion : AutenticacionService
   ) {}
 
   @post('/usuarios')
@@ -44,7 +43,26 @@ export class UsusarioController {
     })
     usuario: Omit<Usuario, 'id'>,
   ): Promise<Usuario> {
-    return this.usuarioRepository.create(usuario);
+     //Llega con los datos creados
+     let clave = this.servicioAutenticacion.GenerarClave();
+     let claveCifrada = this.servicioAutenticacion.CifrarClave(clave);
+     usuario.clave = claveCifrada;
+    //Enviar notificacion de Ususario y Clave
+    let u = await this.usuarioRepository.create(usuario);
+
+    //Consumir servicio de notificación
+    //Variables envio de dates
+    let destino = usuario.correo;
+    let asunto = "Registro OnLineStore";
+    let mensaje = `Hola ${usuario.nombres}, su nombre de ususario es: ${usuario.correo}
+    y su contraseña asignada es: ${clave}`;
+
+   fetch(`http://127.0.0.1:5000/envio-correo?correo_destino=${destino}&asunto=${asunto}&contenido=${mensaje}`)
+    .then((data: any) => {
+      console.log(data);
+    })
+
+    return u;
   }
 
   @get('/usuarios/count')
