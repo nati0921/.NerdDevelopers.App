@@ -15,14 +15,14 @@ import {
 import {Producto} from '../models';
 import {ProductoRepository} from '../repositories';
 
-@authenticate("admin")
+//@authenticate("admin")
 export class ProductoController {
   constructor(
     @repository(ProductoRepository)
     public productoRepository : ProductoRepository,
   ) {}
 
-  //@authenticate("admin")
+  @authenticate("asesor")
   @post('/productos')
   @response(200, {
     description: 'Producto model instance',
