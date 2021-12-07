@@ -1,4 +1,4 @@
-import {Entity, model, property, hasMany, belongsTo} from '@loopback/repository';
+import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
 import {Carrito} from './carrito.model';
 import {MetodoPago} from './metodo-pago.model';
 
@@ -27,7 +27,7 @@ export class Producto extends Entity {
     type: 'string',
     required: true,
   })
-  referencia: string;
+  imagen: string;
 
   @property({
     type: 'number',
