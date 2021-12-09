@@ -43,12 +43,13 @@ export class Producto extends Entity {
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
   })
   idCategoria: string;
 
   @property({
     type: 'string',
+    required: false,
   })
   categoriaProductoId?: string;
 
