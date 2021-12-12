@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {service} from '@loopback/core';
 import {
   Count,
@@ -18,39 +19,43 @@ import {UsuarioRepository} from '../repositories';
 import {AutenticacionService} from '../services'; //Se requiere importar
 const fetch = require("node-fetch");
 //Inicializar un objeto para poder llamar un método
+@authenticate("admin")
 export class UsusarioController {
   constructor(
     @repository(UsuarioRepository)
-    public usuarioRepository : UsuarioRepository,
+    public usuarioRepository: UsuarioRepository,
     @service(AutenticacionService)
-    public servicioAutenticacion : AutenticacionService
-  ) {}
+    public servicioAutenticacion: AutenticacionService
+  ) { }
 
-@post('/identificarUsuario', {
-  responses: {
-    '200':{
-      description: 'Identificación de usuarios'
+  @post('/identificarUsuario', {
+    responses: {
+      '200': {
+        description: 'Identificación de usuarios'
+      }
+    }
+  })
+  async identificarUsusario(
+    @requestBody() credenciales: Credenciales
+  ) {
+    let u = await this.servicioAutenticacion.IdentificarUsusario(credenciales.usuario, credenciales.clave);
+    if (u) {
+      let token = this.servicioAutenticacion.GenerarTokenJWT(u);
+      return {
+        datos: {
+          nombre: u.nombres,
+          correo: u.correo,
+          id: u.id
+        },
+        tk: token
+      }
+    } else {
+      throw new HttpErrors[401]("Datos inválidos")
     }
   }
-})
-async identificarUsusario(
-  @requestBody() credenciales : Credenciales
-){
-  let u = await this.servicioAutenticacion.IdentificarUsusario(credenciales.usuario, credenciales.clave);
-  if(u){
-    let token = this.servicioAutenticacion.GenerarTokenJWT(u);
-    return{
-      datos: {
-        nombre: u.nombres,
-        correo: u.correo,
-        id: u.id
-      },
-      tk: token
-    }
-  }else{
-    throw new HttpErrors[401]("Datos inválidos")
-  }
-}
+
+
+
 
   @post('/usuarios')
   @response(200, {
@@ -70,10 +75,10 @@ async identificarUsusario(
     })
     usuario: Omit<Usuario, 'id'>,
   ): Promise<Usuario> {
-     //Llega con los datos creados
-     let clave = this.servicioAutenticacion.GenerarClave();
-     let claveCifrada = this.servicioAutenticacion.CifrarClave(clave);
-     usuario.clave = claveCifrada;
+    //Llega con los datos creados
+    let clave = this.servicioAutenticacion.GenerarClave();
+    let claveCifrada = this.servicioAutenticacion.CifrarClave(clave);
+    usuario.clave = claveCifrada;
     //Enviar notificacion de Ususario y Clave
     let u = await this.usuarioRepository.create(usuario);
 
@@ -84,10 +89,10 @@ async identificarUsusario(
     let mensaje = `Hola ${usuario.nombres}, su nombre de ususario es: ${usuario.correo}
     y su contraseña asignada es: ${clave}`;
 
-   fetch(`${Llaves.urlServiciosNotificaciones}/envio-correo?correo_destino=${destino}&asunto=${asunto}&contenido=${mensaje}`)
-    .then((data: any) => {
-      console.log(data);
-    })
+    fetch(`${Llaves.urlServiciosNotificaciones}/envio-correo?correo_destino=${destino}&asunto=${asunto}&contenido=${mensaje}`)
+      .then((data: any) => {
+        console.log(data);
+      })
 
     return u;
   }
