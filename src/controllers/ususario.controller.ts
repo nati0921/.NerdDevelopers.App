@@ -19,7 +19,7 @@ import {UsuarioRepository} from '../repositories';
 import {AutenticacionService} from '../services'; //Se requiere importar
 const fetch = require("node-fetch");
 //Inicializar un objeto para poder llamar un método
-@authenticate("admin")
+
 export class UsusarioController {
   constructor(
     @repository(UsuarioRepository)
@@ -144,7 +144,7 @@ export class UsusarioController {
   ): Promise<Count> {
     return this.usuarioRepository.updateAll(usuario, where);
   }
-
+  @authenticate.skip()
   @get('/usuarios/{id}')
   @response(200, {
     description: 'Usuario model instance',
